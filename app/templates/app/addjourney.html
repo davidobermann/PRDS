@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+    <h1>Hello, {{ user.username }}</h1>
+
+    <p> Please add your Journey </p>
+    <div class="container">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            {{ form.origin|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ form.destination|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ form.price|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ form.date|as_crispy_field }}
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+{% endblock %}

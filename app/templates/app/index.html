@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    {% if user.is_authenticated %}
+        <div class="container">
+            <div class="align-center">
+                <div class="row">
+                    <br>
+                </div>
+                <div class="row">
+                    {{ maingoal.name }} <br>
+                    {{ maingoal.type }} <br>
+                    {{ maingoal.criteria }} <br>
+                    {{ maingoal.startdate }} <br>
+                    {{ maingoal.enddate }} <br>
+                </div>
+                <h2> Welcome to the site</h2><br>
+                <div>
+                    <a href="{% url 'addjourney' %}">Add A new Journey</a><br>
+                    <a href="{% url 'addgoal' %}">Add A new Goal</a><br>
+                    <a href="{% url 'upload_journeys' %}">Upload Journey File</a><br>
+                    <a href="{% url 'see_data' %}">See entered Data</a><br>
+                    <a href="{% url 'see_goals' %}">See entered Goals</a><br>
+                    <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+
+        <br class="mt-0 mb-4">
+        <div class="container">
+            <div class="global-container">
+                <div class="card login-form">
+                    <div class="card-body">
+                        <h3 class="card-title text-center">Welcome to the KlimaticketR</h3>
+                        <div class="card-text">
+                            <a class="btn btn-block btn-rounded btn-outline-primary" href="{% url 'login' %}">Login</a>
+                            <a class="btn btn-block btn-rounded btn-primary" href="{% url 'signup' %}">Register</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            html, body {
+                height: 100%;
+                background-color: #f5f5f5;
+            }
+
+            .global-container {
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                /* background-color: #f5f5f5; */
+            }
+
+            form {
+                padding-top: 10px;
+                font-size: 14px;
+                margin-top: 30px;
+            }
+
+            .card-title {
+                font-weight: 300;
+            }
+
+            .btn {
+                font-size: 14px;
+                margin-top: 20px;
+            }
+
+
+            .login-form {
+                width: 330px;
+                margin: 20px;
+            }
+
+            .sign-up {
+                text-align: center;
+                padding: 20px 0 0;
+            }
+
+            .alert {
+                margin-bottom: -30px;
+                font-size: 13px;
+                margin-top: 20px;
+            }
+        </style>
+
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <h1>Hello, {{ user.username }}</h1>
+
+    <p> Please add your Goal </p>
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.name|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.type|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.criteria|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.startdate|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.enddate|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.is_main|as_crispy_field}}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+{% endblock %}

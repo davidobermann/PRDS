@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h1>Hello, {{ user.username|default:'Guest' }}</h1>
+
+    <p> Welcome to the site</p>
+    <div>
+        {% if user.is_authenticated %}
+
+            <table class="table table-striped table-bordered table-sm">
+                <thead class="thead-dark">
+                <tr>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in journeys %}
+                    <tr>
+                        <td>{{ item.origin }}</td>
+                        <td>{{ item.destination }}</td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.date }}</td>
+                        <script>
+                            function askok(e) {
+                                if(!confirm('Are you sure you want to delete this?')) e.preventDefault();
+                                return
+                            }
+                        </script>
+                        <td>
+                            <a onclick="askok(event);" href="/delete_journey/{{ item.id }} "><i class="bi-trash"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </div>
+
+{% endblock %}

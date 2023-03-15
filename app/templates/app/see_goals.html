@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h1>Hello, {{ user.username|default:'Guest' }}</h1>
+
+    <p> Welcome to the site</p>
+    <div>
+        {% if user.is_authenticated %}
+
+            <table class="table table-striped table-bordered table-sm">
+                <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Criteria</th>
+                    <th>Startdate</th>
+                    <th>Enddate</th>
+                    <th>Progress</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in goals %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.type }}</td>
+                        <td>{{ item.criteria }}</td>
+                        <td>{{ item.startdate }}</td>
+                        <td>{{ item.enddate }}</td>
+                        <td>{{ item.progress }}</td>
+                        <script>
+                            function askok(e) {
+                                if(!confirm('Are you sure you want to delete this?')) e.preventDefault();
+                                return
+                            }
+                        </script>
+                        <td>
+                            <a onclick="askok(event);" href="/delete_goal/{{ item.id }} "><i class="bi-trash"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
