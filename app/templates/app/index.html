@@ -2,29 +2,226 @@
 {% block content %}
 
     {% if user.is_authenticated %}
-        <div class="container">
-            <div class="align-center">
-                <div class="row">
-                    <br>
-                </div>
-                <div class="row">
-                    {{ maingoal.name }} <br>
-                    {{ maingoal.type }} <br>
-                    {{ maingoal.criteria }} <br>
-                    {{ maingoal.startdate }} <br>
-                    {{ maingoal.enddate }} <br>
-                </div>
-                <h2> Welcome to the site</h2><br>
-                <div>
-                    <a href="{% url 'addjourney' %}">Add A new Journey</a><br>
-                    <a href="{% url 'addgoal' %}">Add A new Goal</a><br>
-                    <a href="{% url 'upload_journeys' %}">Upload Journey File</a><br>
-                    <a href="{% url 'see_data' %}">See entered Data</a><br>
-                    <a href="{% url 'see_goals' %}">See entered Goals</a><br>
-                    <a href="{% url 'logout' %}">Logout</a>
+        <div class="col d-flex justify-content-center">
+            <div class="card w-50 d-none d-sm-flex"> <!-- show normally on md and above -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <!-- Container wrapper -->
+                    <div class="container-fluid">
+                        <!-- Toggle button -->
+                        <button
+                                class="navbar-toggler"
+                                type="button"
+                                data-mdb-toggle="collapse"
+                                data-mdb-target="#navbarCenteredExample"
+                                aria-controls="navbarCenteredExample"
+                                aria-expanded="false"
+                                aria-label="Toggle navigation"
+                        >
+                            <i class="fas fa-bars"></i>
+                        </button>
+
+                        <!-- Collapsible wrapper -->
+                        <div
+                                class="collapse navbar-collapse justify-content-center"
+                                id="navbarCenteredExample"
+                        >
+                            <!-- Left links -->
+                            <ul class="navbar-nav mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" aria-current="page" href="{% url 'insights' %}">Insights</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" aria-current="page" href="{% url 'see_data' %}">Journeys</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'see_goals' %}">Goals</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Settings</a>
+                                </li>
+                            </ul>
+                            <!-- Left links -->
+                        </div>
+                        <!-- Collapsible wrapper -->
+                    </div>
+                    <!-- Container wrapper -->
+                </nav>
+
+                <div class="justify-content-center" align="center">
+                    <div class="row">
+                    </div>
+
+                    <h2> Your progress on your main goal:</h2>
+
+                    <div class="row">
+                        <div class="chart_prog"></div>
+                    </div>
+
+                    <div class="row">
+                        <br>
+                        <p>{{ maingoal.name }} of type: {{ maingoal.type }} <br>
+                            to reach {{ maingoal.criteria }}
+                            {% if is_fq %}
+                                Journeys
+                            {% else %}
+                                € in travel costs
+                            {% endif %} <br>
+                            between {{ maingoal.startdate|date:'d.m.y' }} and {{ maingoal.enddate|date:'d.m.y' }} <br>
+                        </p>
+                    </div>
+
+                    <div class="row">
+                        <div class="container p-2">
+                            <a href="{% url 'addjourney' %}" type="button" class="btn btn-danger btn-rounded">
+                                <i class="fas fa-plus mr-1"></i>
+                                ADD
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </div>
                 </div>
             </div>
+            <div class="card w-100 d-sm-none">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <!-- Container wrapper -->
+                    <div class="container-fluid">
+                        <!-- Toggle button -->
+                        <button
+                                class="navbar-toggler"
+                                type="button"
+                                data-mdb-toggle="collapse"
+                                data-mdb-target="#navbarCenteredExample"
+                                aria-controls="navbarCenteredExample"
+                                aria-expanded="false"
+                                aria-label="Toggle navigation"
+                        >
+                            <i class="fas fa-bars"></i>
+                        </button>
+
+                        <!-- Collapsible wrapper -->
+                        <div
+                                class="collapse navbar-collapse justify-content-center"
+                                id="navbarCenteredExample"
+                        >
+                            <!-- Left links -->
+                            <ul class="navbar-nav mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" aria-current="page" href="{% url 'see_data' %}">Journeys</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'see_goals' %}">Goals</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Settings</a>
+                                </li>
+                            </ul>
+                            <!-- Left links -->
+                        </div>
+                        <!-- Collapsible wrapper -->
+                    </div>
+                    <!-- Container wrapper -->
+                </nav>
+                <div class="justify-content-center" align="center">
+                    <div class="row">
+                        <br>
+                    </div>
+
+                    <h2> Your progress on your main goal:</h2>
+
+                    <div class="chart_progm">
+                    </div>
+
+                    <div class="row">
+                        <br>
+                        <p>{{ maingoal.name }} of type: {{ maingoal.type }} <br>
+                            to reach {{ maingoal.criteria }}
+                            {% if is_fq %}
+                                Journeys
+                            {% else %}
+                                € in travel costs
+                            {% endif %} <br>
+                            between {{ maingoal.startdate|date:'d.m.y' }} and {{ maingoal.enddate|date:'d.m.y' }} <br>
+                        </p>
+                    </div>
+
+                    <div class="row">
+                        <div class="container p-2">
+                            <a href="{% url 'addjourney' %}" type="button" class="btn btn-danger btn-rounded">
+                                <i class="fas fa-plus mr-1"></i>
+                                ADD
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
+        <script>
+            let fact = 1.1;
+            var val = {{ progress__ }};
+            var max = 100;
+            if (val > 100) max = val * fact;
+
+            var maingoalprog = c3.generate({
+                bindto: '.chart_prog',
+                data: {
+                    columns: [['progress', val]],
+                    type: 'gauge'
+                },
+                gauge: {
+                    label: {
+                        format: function (value, ratio) {
+                            return value + '%'; //returning here the value and not the ratio
+                        }
+                    },
+                    max: max
+                },
+                color: {
+                    pattern: ['red', 'yellow', 'orange', 'green'],
+                    threshold: {
+                        values: [50, 75, 100]
+                    }
+                }
+            })
+
+            var valm = {{ progress__ }};
+            var maxm = 100;
+            if (val > 100) maxm = val * fact;
+            var maingoalprogm = c3.generate({
+                bindto: '.chart_progm',
+                data: {
+                    columns: [['progress', valm]],
+                    type: 'gauge'
+                },
+                gauge: {
+                    label: {
+                        format: function (value, ratio) {
+                            return value + '%'; //returning here the value and not the ratio
+                        }
+                    },
+                    max: maxm
+                },
+                color: {
+                    pattern: ['red', 'yellow', 'orange', 'green'],
+                    threshold: {
+                        values: [50, 75, 100]
+                    }
+                }
+            })
+        </script>
     {% else %}
 
         <br class="mt-0 mb-4">

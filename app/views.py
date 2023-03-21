@@ -16,7 +16,22 @@ def home(request):
     if request.user.is_authenticated:
         main_goal = get_main_goal(request.user)
         context['maingoal'] = main_goal
+        context['progress'] = main_goal['progress'] / main_goal ['criteria']
+        context['progress__'] = int(main_goal['progress'] / main_goal ['criteria'] * 100)
+        context['is_fq'] = (main_goal['type'] == 'FQ')
     return render(request, 'app/index.html', context)  # dasisteingutespasswort
+
+@login_required
+def insights(request):
+    #retrieve data for certain graphs and put data into context
+    #render data in template
+    pass
+
+@login_required
+def set_main_goal(request, id):
+    Goal.objects.filter(user=request.user).update(is_main=False)
+    Goal.objects.filter(user=request.user, id=id).update(is_main=True)
+    return redirect('see_goals')
 
 
 @login_required
@@ -60,11 +75,11 @@ def see_goals(request):
 
 
 def get_goals_for_user(user):
-    return Goal.objects.filter(user=user).values()
+    return Goal.objects.filter(user=user).order_by('timestamp').values()
 
 
 def get_journeys_for_user(user):
-    return Journey.objects.filter(user=user).values()
+    return Journey.objects.filter(user=user).order_by('date').values()
 
 
 @login_required

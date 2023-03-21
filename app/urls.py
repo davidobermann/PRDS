@@ -11,5 +11,7 @@ urlpatterns = [
     path('see_goals', see_goals, name='see_goals'),
     path('addgoal', addgoal, name='addgoal'),
     path('delete_journey/<int:id>', delete_journey, name='delete_journey'),
-    path('delete_goal/<int:id>', delete_goal, name='delete_goal')
+    path('delete_goal/<int:id>', delete_goal, name='delete_goal'),
+    path('set_main_goal/<int:id>', set_main_goal, name='set_main_goal'),
+    path('insights', insights, name='insights')
 ]

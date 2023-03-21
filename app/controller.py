@@ -21,7 +21,7 @@ def on_journey_insert(user, journey):
     goals_affected = Goal.objects.filter(
         user=user,
         startdate__lte=journey.date,
-        enddate__gte=journey.date).values()
+        enddate__gte=journey.date).all()
 
     for goal in goals_affected:
         if goal.type == 'FQ':
