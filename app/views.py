@@ -28,11 +28,14 @@ def home(request):
 def insights(request):
     #retrieve data for certain graphs and put data into context
     #render data in template
-
+    context = {}
     #travels in the last 12 months:
-    get_travles_last_12_months(request.user)
-
-    pass
+    context['dash_board_data_total'] = get_dashboard_data_total(request.user)
+    context['dash_board_data_last365'] = get_dashboard_data_last365(request.user)
+    context['travels_last_12_months'] = get_travles_last_12_months(request.user)
+    context['money_last_12_months'] = get_money_last_12_months(request.user)
+    context['price_plot_last365'] = get_price_plot_last365(request.user)
+    return render(request, 'app/insights.html', context)
 
 @login_required
 def set_main_goal(request, id):

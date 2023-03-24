@@ -1,7 +1,7 @@
-from datetime import datetime
-
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Count
+from django.db.models.functions import TruncMonth
 from django.utils import timezone
+import datetime
 
 from app.models import Journey, Goal
 
@@ -62,38 +62,42 @@ def eval_goal_progress(user, goal):
 
 def get_travles_last_12_months(user):
     now = timezone.now().date()
-    ayearago = timezone.now().date() + datetime.timedelta(days=-365)
-    query = Journey.objects.filter(user=user, date__range=(now, ayearago))
-    monthcnt = [None] * 12
-    i = 0
-    for month in monthcnt:
-        monthcnt[i] = query.filter(date__month=i + 1).count()
-        i += 1
+    ayearago = timezone.now().date() + datetime.timedelta(days=(-365))
+    query = Journey.objects.filter(user=user, date__range=[ayearago, now])
+    result = query.annotate(month=TruncMonth('date')).values('month').annotate(total=Count('timestamp')).all()
+    monthcnt = [0] * 12
+    for item in result:
+        monthcnt[item['month'].month-1] = item['total']
     return monthcnt
 
 
 def get_dashboard_data_total(user):
     all_travels = Journey.objects.filter(user=user).count()
     goals_reached = Goal.objects.filter(user=user, progress__gte=F('criteria')).count()
-    money_traveld = Journey.objects.filter(user=user).aggregate(Sum('price'))
+    money_traveld = Journey.objects.filter(user=user).aggregate(Sum('price'))['price__sum'] or 0
     return all_travels, goals_reached, money_traveld
 
 
 def get_dashboard_data_last365(user):
     now = timezone.now().date()
     ayearago = timezone.now().date() + datetime.timedelta(days=-365)
-    all_travels = Journey.objects.filter(user=user, date__range=(now, ayearago)).count()
+    all_travels = Journey.objects.filter(user=user, date__range=(ayearago, now)).count()
     goals_reached = Goal.objects.filter(user=user, progress__gte=F('criteria')).count()
-    money_traveld = Journey.objects.filter(user=user).aggregate(Sum('price'))
+    money_traveld = Journey.objects.filter(user=user).aggregate(Sum('price'))['price__sum'] or 0
+    return all_travels, goals_reached, money_traveld
 
 def get_money_last_12_months(user):
     now = timezone.now().date()
-    ayearago = timezone.now().date() + datetime.timedelta(days=-365)
-    query = Journey.objects.filter(user=user, date__range=(now, ayearago))
-    monthcnt = [None] * 12
-    i = 0
-    for month in monthcnt:
-        monthcnt[i] = query.filter(date__month=i + 1).aggregate(Sum('price'))
-        i += 1
+    ayearago = timezone.now().date() + datetime.timedelta(days=(-365))
+    query = Journey.objects.filter(user=user, date__range=[ayearago, now])
+    result = query.annotate(month=TruncMonth('date')).values('month').annotate(total=Sum('price')).all()
+    monthcnt = [0] * 12
+    for item in result:
+        monthcnt[item['month'].month - 1] = item['total']
     return monthcnt
 
+def get_price_plot_last365(user):
+    now = timezone.now().date()
+    ayearago = timezone.now().date() + datetime.timedelta(days=-365)
+    prices = Journey.objects.filter(user=user, date__range=(ayearago, now)).values('price')
+    return prices

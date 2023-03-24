@@ -39,15 +39,3 @@ class Journey(models.Model):
     price = models.FloatField()
     date = models.DateField(blank=True, null=True)
     timestamp = models.DateTimeField(default=django.utils.timezone.now)
-
-    def __str__(self):
-        print('')
-        return self.user +\
-            ' from ' +\
-            self. origin +\
-            ' to ' +\
-            self.destination +\
-            ' on ' +\
-            self.date +\
-            ' for ' +\
-            self.price

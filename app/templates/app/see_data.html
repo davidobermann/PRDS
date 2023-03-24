@@ -31,8 +31,10 @@
                                     <a class="nav-link" aria-current="page" href="{% url 'home' %}">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page"
-                                       href="{% url 'see_data' %}">Journeys</a>
+                                    <a class="nav-link" aria-current="page" href="{% url 'insights' %}">Insights</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="{% url 'see_data' %}">Journeys</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'see_goals' %}">Goals</a>
@@ -74,7 +76,8 @@
                                     }
                                 </script>
                                 <td>
-                                    <a class="btn btn-rounded btn-outline" onclick="askok(event);" href="/delete_journey/{{ item.id }} ">
+                                    <a class="btn btn-rounded btn-outline" onclick="askok(event);"
+                                       href="/delete_journey/{{ item.id }} ">
                                         <i class="bi-trash"></i>
                                     </a>
                                 </td>
@@ -127,8 +130,10 @@
                                     <a class="nav-link" aria-current="page" href="{% url 'home' %}">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page"
-                                       href="{% url 'see_data' %}">Journeys</a>
+                                    <a class="nav-link" aria-current="page" href="{% url 'insights' %}">Insights</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="{% url 'see_data' %}">Journeys</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'see_goals' %}">Goals</a>
@@ -170,7 +175,8 @@
                                     }
                                 </script>
                                 <td>
-                                    <a class="btn btn-rounded btn-outline" onclick="askok(event);" href="/delete_journey/{{ item.id }} ">
+                                    <a class="btn btn-rounded btn-outline" onclick="askok(event);"
+                                       href="/delete_journey/{{ item.id }} ">
                                         <i class="bi-trash"></i>
                                     </a>
                                 </td>
