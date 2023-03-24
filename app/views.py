@@ -116,6 +116,7 @@ def addjourney(request):
 @login_required
 def delete_journey(request, id):
     journey = Journey.objects.get(id=id)
+    on_journey_delete(request.user, journey)
     journey.delete()
     return redirect('see_data')
 

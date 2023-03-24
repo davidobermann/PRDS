@@ -32,6 +32,19 @@ def on_journey_insert(user, journey):
             goal.progress += journey.price
         goal.save(update_fields=['progress'])
 
+def on_journey_delete(user, journey):
+    goals_affected = Goal.objects.filter(
+        user=user,
+        startdate__lte=journey.date,
+        enddate__gte=journey.date).all()
+
+    for goal in goals_affected:
+        if goal.type == 'FQ':
+            goal.progress -= 1
+        else:
+            goal.progress -= journey.price
+        goal.save(update_fields=['progress'])
+
 
 def on_goal_insert(user, goal):
     goal.progress = eval_goal_progress(user, goal)
