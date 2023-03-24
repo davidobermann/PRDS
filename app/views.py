@@ -1,7 +1,10 @@
 import os
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
+from django.db.models.functions import TruncMonth
 from django.shortcuts import render, redirect
+from django.utils import dateformat, timezone
 
 from app.controller import *
 from app.forms import JourneyForm, UploadFileForm, GoalForm
@@ -25,6 +28,10 @@ def home(request):
 def insights(request):
     #retrieve data for certain graphs and put data into context
     #render data in template
+
+    #travels in the last 12 months:
+    get_travles_last_12_months(request.user)
+
     pass
 
 @login_required
