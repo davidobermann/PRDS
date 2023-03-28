@@ -18,10 +18,13 @@ def home(request):
     context = {}
     if request.user.is_authenticated:
         main_goal = get_main_goal(request.user)
-        context['maingoal'] = main_goal
-        context['progress'] = main_goal['progress'] / main_goal ['criteria']
-        context['progress__'] = int(main_goal['progress'] / main_goal ['criteria'] * 100)
-        context['is_fq'] = (main_goal['type'] == 'FQ')
+        if main_goal != None:
+            context['maingoal'] = main_goal
+            context['progress'] = main_goal['progress'] / main_goal['criteria']
+            context['progress__'] = int(main_goal['progress'] / main_goal['criteria'] * 100)
+            context['is_fq'] = (main_goal['type'] == 'FQ')
+        else:
+            context['has_main'] = False
     return render(request, 'app/index.html', context)  # dasisteingutespasswort
 
 @login_required

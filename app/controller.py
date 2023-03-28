@@ -14,9 +14,10 @@ class GoalProgressEntry:
 
 def get_main_goal(user):
     maingoal = Goal.objects.filter(user=user, is_main=True).values()
-    if maingoal.count() > 1:
-        raise ValueError('Too many main goals specified')
-    return maingoal[0]
+    if not maingoal:
+        return None
+    else:
+        return maingoal
 
 
 def on_journey_insert(user, journey):
