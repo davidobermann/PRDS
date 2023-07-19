@@ -6,6 +6,7 @@ from django.conf import settings
 urlpatterns = [
     path('', home, name='home'),
     path('addjourney', addjourney, name='addjourney'),
+    path('delete_all', delete_all, name='delete_all'),
     path('upload_journeys', upload_journeys, name='upload_journeys'),
     path('see_data', see_data, name='see_data'),
     path('see_goals', see_goals, name='see_goals'),

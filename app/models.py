@@ -33,6 +33,7 @@ class Goal(models.Model):
 
 
 class Journey(models.Model):
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     origin = models.CharField(max_length=255)
     destination = models.CharField(max_length=255)

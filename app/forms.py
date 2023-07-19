@@ -25,7 +25,7 @@ class GoalForm(forms.ModelForm):
     ayear = dateformat.format(timezone.now().date() + datetime.timedelta(days=365), 'd.m.Y')
     startdate = forms.DateField(input_formats=["%d.%m.%Y"], initial=now)
     enddate = forms.DateField(input_formats=["%d.%m.%Y"], initial=ayear)
-    type = forms.ChoiceField(choices=Goal.GoalType.choices, widget=forms.RadioSelect())
+    type = forms.ChoiceField(choices=Goal.GoalType.choices, widget=forms.RadioSelect(), initial=Goal.GoalType.FI)
     is_main = forms.BooleanField(label='This goal is the main goal to be displayed in the home screen.', required=False)
 
     class Meta:

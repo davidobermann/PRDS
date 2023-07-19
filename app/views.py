@@ -23,21 +23,16 @@ def home(request):
             context['progress'] = main_goal['progress'] / main_goal['criteria']
             context['progress__'] = int(main_goal['progress'] / main_goal['criteria'] * 100)
             context['is_fq'] = (main_goal['type'] == 'FQ')
+            context['has_main'] = True
         else:
             context['has_main'] = False
     return render(request, 'app/index.html', context)  # dasisteingutespasswort
 
 @login_required
 def insights(request):
-    #retrieve data for certain graphs and put data into context
-    #render data in template
     context = {}
-    #travels in the last 12 months:
     context['dash_board_data_total'] = get_dashboard_data_total(request.user)
-    context['dash_board_data_last365'] = get_dashboard_data_last365(request.user)
-    context['travels_last_12_months'] = get_travles_last_12_months(request.user)
-    context['money_last_12_months'] = get_money_last_12_months(request.user)
-    context['price_plot_last365'] = get_price_plot_last365(request.user)
+    context['journeys'] = get_journeys_for_user(request.user)
     return render(request, 'app/insights.html', context)
 
 @login_required
@@ -121,6 +116,26 @@ def delete_journey(request, id):
     journey = Journey.objects.get(id=id)
     on_journey_delete(request.user, journey)
     journey.delete()
+    return redirect('see_data')
+
+
+def delete_journey_manual(request, id):
+    journey = Journey.objects.get(id=id)
+    journey.delete()
+
+@login_required
+def delete_all(request):
+    journeys = get_journeys_for_user(request.user)
+
+    for journey in journeys:
+        delete_journey_manual(request, journey['id'])
+
+    goals = Goal.objects.filter(user=request.user).all()
+
+    for goal in goals:
+        goal.progress = 0
+        goal.save(update_fields=['progress'])
+
     return redirect('see_data')
 
 @login_required

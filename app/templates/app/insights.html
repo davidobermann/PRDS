@@ -78,81 +78,176 @@
                         </div>
                     </div>
 
-                    <!-- Travel per month -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card m-2">
                                 <div class="card-body">
-                                    <h5 class="card-title">Journeys per month in the last 365 Days</h5>
-                                    <div class="chart_travel_month" style="width: 90%"></div>
+                                    <h5 class="card-title">Timefilter for data</h5>
+                                    <input type="date" onchange="updateChart()" id="startdate">
+                                    to
+                                    <input type="date" onchange="updateChart()" id="enddate">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Money per month -->
+                    <!-- Travel Time filter -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card m-2">
                                 <div class="card-body">
-                                    <h5 class="card-title">Money spent per month in the last 365 Days</h5>
-                                    <div class="chart_money_month" style="width: 90%"></div>
+                                    <h5 class="card-title">Journeys per Month</h5>
+                                    <canvas id="myChart" style="width: 90%"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Money Time filter -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card m-2">
+                                <div class="card-body">
+                                    <h5 class="card-title">Cumulative costs per Month</h5>
+                                    <canvas id="moneyChart" style="width: 90%"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
                     <script>
-                        var chart_1 = c3.generate({
-                            bindto: '.chart_travel_month',
+                        let ctx = document.getElementById("myChart").getContext("2d");
+                        let ctx_money = document.getElementById("moneyChart").getContext("2d");
+
+                        let startdateinput = document.getElementById("startdate")
+                        let enddateinput = document.getElementById("enddate")
+
+                        enddateinput.value = new Date().toISOString().substring(0, 10);
+                        var startd = new Date();
+                        startd.setFullYear(startd.getFullYear() - 1);
+                        startdateinput.value = startd.toISOString().substring(0, 10);
+
+
+                        const journeys = [
+                            {% for item in journeys %}
+                                {
+                                    date: new Date('{{ item.date|date:'Y-m-d' }}'),
+                                    price: {{ item.price }}
+                                },
+                            {% endfor %}
+                        ];
+
+                        var freqMap = new Map();
+                        journeys.forEach(function (date) {
+                            let monthName = date.date.toLocaleString("en-us", {
+                                month: "short"
+                            });
+                            let key = monthName + "-" + date.date.getFullYear().toString().substr(-2);
+                            let count = freqMap.get(key) || 0;
+                            freqMap.set(key, ++count);
+                        });
+
+                        const chart = new Chart(ctx, {
+                            plugins: [ChartDataLabels],
+                            type: "bar",
                             data: {
-                                columns: [
-                                    ['data',
-                                        {% for item in travels_last_12_months %}
-                                            {{ item }},
-                                        {% endfor %}
-                                    ],
-                                ],
-                                type: 'bar',
-                                labels: true
-                            },
-                            bar: {
-                                width: {
-                                    ratio: 0.5 // this makes bar width 50% of length between ticks
-                                }
-                            },
-                            axis: {
-                                x: {
-                                    type: 'category',
-                                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez']
-                                }
+                                labels: [...freqMap.keys()],
+                                datasets: [
+                                    {
+                                        label: "Journeys per month",
+                                        backgroundColor: "#79AEC8",
+                                        borderColor: "#417690",
+                                        data: [...freqMap.values()],
+                                        datalabels: {
+                                            color: "white"
+                                        }
+                                    }
+                                ]
                             }
                         });
-                        var chart_2 = c3.generate({
-                            bindto: '.chart_money_month',
+
+                        var cumsumMap = new Map();
+                        journeys.forEach(function (date) {
+                            let monthName = date.date.toLocaleString("en-us", {
+                                month: "short"
+                            });
+                            let key = monthName + "-" + date.date.getFullYear().toString().substr(-2);
+                            let count = cumsumMap.get(key) || 0;
+                            cumsumMap.set(key, count + date.price);
+                        });
+
+                        var old = 0;
+                        cumsumMap.forEach(function (price, month) {
+                            old = old + price;
+                            cumsumMap.set(month, old);
+                        });
+
+                        const chart_money = new Chart(ctx_money, {
+                            plugins: [ChartDataLabels],
+                            type: "line",
                             data: {
-                                columns: [
-                                    ['data',
-                                        {% for item in money_last_12_months %}
-                                            {{ item }},
-                                        {% endfor %}
-                                    ],
-                                ],
-                                type: 'bar',
-                                labels: true
-                            },
-                            bar: {
-                                width: {
-                                    ratio: 0.5 // this makes bar width 50% of length between ticks
-                                }
-                            },
-                            axis: {
-                                x: {
-                                    type: 'category',
-                                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez']
-                                }
+                                labels: [...cumsumMap.keys()],
+                                datasets: [
+                                    {
+                                        label: "Money worth traveled",
+                                        backgroundColor: "#79AEC8",
+                                        borderColor: "#417690",
+                                        data: [...cumsumMap.values()],
+                                        datalabels: {
+                                            color: "#417690",
+                                            formatter: Math.round,
+                                            align: 'end'
+                                        }
+                                    }
+                                ]
                             }
                         });
+
+                        function filterJSONData(inp, id1, id2) {
+                            let copy = [...inp]
+                            const start = new Date(document.getElementById(id1).value);
+                            const end = new Date(document.getElementById(id2).value);
+                            let ret = copy.filter(date => date.date >= start && date.date <= end);
+                            return ret;
+                        }
+
+                        function updateChart() {
+                            let filt_js = filterJSONData(journeys, "startdate", "enddate");
+                            let freqMap = new Map();
+                            filt_js.forEach(function (date) {
+                                var monthName = date.date.toLocaleString("en-us", {
+                                    month: "short"
+                                });
+                                var key = monthName + "-" + date.date.getFullYear().toString().substr(-2);
+                                var count = freqMap.get(key) || 0;
+                                freqMap.set(key, ++count);
+                            });
+                            chart.config.data.datasets[0].data = [...freqMap.values()];
+                            chart.config.data.labels = [...freqMap.keys()];
+                            chart.update();
+
+                            let cumsumMap = new Map();
+                            filt_js.forEach(function (date) {
+                                let monthName = date.date.toLocaleString("en-us", {
+                                    month: "short"
+                                });
+                                let key = monthName + "-" + date.date.getFullYear().toString().substr(-2);
+                                let count = cumsumMap.get(key) || 0;
+                                cumsumMap.set(key, count + date.price);
+                            });
+
+                            let old = 0;
+                            cumsumMap.forEach(function (price, month) {
+                                old = old + price;
+                                cumsumMap.set(month, old);
+                            });
+
+                            chart_money.config.data.datasets[0].data = [...cumsumMap.values()];
+                            chart_money.config.data.labels = [...cumsumMap.keys()];
+                            chart_money.update();
+                        }
                     </script>
 
                     <div>
@@ -234,81 +329,165 @@
                         </div>
                     </div>
 
-                    <!-- Travel per month -->
+                    <!-- Filter input -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card m-2">
                                 <div class="card-body">
-                                    <h5 class="card-title">Journeys per month in the last 365 Days</h5>
-                                    <div class="chart_travel_month_s" style="width: 90%"></div>
+                                    <h5 class="card-title">Timefilter for data</h5>
+                                    <input type="date" onchange="updateChart_2()" id="startdate_2">
+                                    to
+                                    <input type="date" onchange="updateChart_2()" id="enddate_2">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Money per month -->
+                    <!-- Travel Time filter -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card m-2">
                                 <div class="card-body">
-                                    <h5 class="card-title">Money spent per month in the last 365 Days</h5>
-                                    <div class="chart_money_month_s" style="width: 90%"></div>
+                                    <h5 class="card-title">Journeys per Month</h5>
+                                    <canvas id="myChart_2" style="width: 90%"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Money Time filter -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card m-2">
+                                <div class="card-body">
+                                    <h5 class="card-title">Cumulative costs per Month</h5>
+                                    <canvas id="moneyChart_2" style="width: 90%"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <script>
-                        var chart_1 = c3.generate({
-                            bindto: '.chart_travel_month_s',
+                        let ctx_2 = document.getElementById("myChart_2").getContext("2d");
+                        let ctx_money_2 = document.getElementById("moneyChart_2").getContext("2d");
+
+                        let startdateinput_2 = document.getElementById("startdate_2")
+                        let enddateinput_2 = document.getElementById("enddate_2")
+
+                        enddateinput_2.value = new Date().toISOString().substring(0, 10);
+                        var startd_2 = new Date();
+                        startd_2.setFullYear(startd.getFullYear() - 1);
+                        startdateinput_2.value = startd.toISOString().substring(0, 10);
+
+                        var freqMap = new Map();
+                        journeys.forEach(function (date) {
+                            let monthName = date.date.toLocaleString("en-us", {
+                                month: "short"
+                            });
+                            let key = monthName + "-" + date.date.getFullYear().toString().substr(-2);
+                            let count = freqMap.get(key) || 0;
+                            freqMap.set(key, ++count);
+                        });
+
+                        const chart_2 = new Chart(ctx_2, {
+                            plugins: [ChartDataLabels],
+                            type: "bar",
                             data: {
-                                columns: [
-                                    ['data',
-                                        {% for item in travels_last_12_months %}
-                                            {{ item }},
-                                        {% endfor %}
-                                    ],
-                                ],
-                                type: 'bar',
-                                labels: true
-                            },
-                            bar: {
-                                width: {
-                                    ratio: 0.5 // this makes bar width 50% of length between ticks
-                                }
-                            },
-                            axis: {
-                                x: {
-                                    type: 'category',
-                                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez']
-                                }
+                                labels: [...freqMap.keys()],
+                                datasets: [
+                                    {
+                                        label: "Journeys per month",
+                                        backgroundColor: "#79AEC8",
+                                        borderColor: "#417690",
+                                        data: [...freqMap.values()],
+                                        datalabels: {
+                                            color: "white"
+                                        }
+                                    }
+                                ]
                             }
                         });
-                        var chart_2 = c3.generate({
-                            bindto: '.chart_money_month_s',
+
+                        var cumsumMap = new Map();
+                        journeys.forEach(function (date) {
+                            let monthName = date.date.toLocaleString("en-us", {
+                                month: "short"
+                            });
+                            let key = monthName + "-" + date.date.getFullYear().toString().substr(-2);
+                            let count = cumsumMap.get(key) || 0;
+                            cumsumMap.set(key, count + date.price);
+                        });
+
+                        var old = 0;
+                        cumsumMap.forEach(function (price, month) {
+                            old = old + price;
+                            cumsumMap.set(month, old);
+                        });
+
+                        const chart_money_2 = new Chart(ctx_money_2, {
+                            plugins: [ChartDataLabels],
+                            type: "line",
                             data: {
-                                columns: [
-                                    ['data',
-                                        {% for item in money_last_12_months %}
-                                            {{ item }},
-                                        {% endfor %}
-                                    ],
-                                ],
-                                type: 'bar',
-                                labels: true
-                            },
-                            bar: {
-                                width: {
-                                    ratio: 0.5 // this makes bar width 50% of length between ticks
-                                }
-                            },
-                            axis: {
-                                x: {
-                                    type: 'category',
-                                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez']
-                                }
+                                labels: [...cumsumMap.keys()],
+                                datasets: [
+                                    {
+                                        label: "Money worth traveled",
+                                        backgroundColor: "#79AEC8",
+                                        borderColor: "#417690",
+                                        data: [...cumsumMap.values()],
+                                        datalabels: {
+                                            color: "#417690",
+                                            formatter: Math.round,
+                                            align: 'end'
+                                        }
+                                    }
+                                ]
                             }
                         });
+
+                        function filterJSONData(inp, id1, id2) {
+                            let copy = [...inp]
+                            const start = new Date(document.getElementById(id1).value);
+                            const end = new Date(document.getElementById(id2).value);
+                            let ret = copy.filter(date => date.date >= start && date.date <= end);
+                            return ret;
+                        }
+
+                        function updateChart_2(){
+                            let filt_js = filterJSONData(journeys, "startdate_2", "enddate_2");
+                            let freqMap = new Map();
+                            filt_js.forEach(function (date) {
+                                var monthName = date.date.toLocaleString("en-us", {
+                                    month: "short"
+                                });
+                                var key = monthName + "-" + date.date.getFullYear().toString().substr(-2);
+                                var count = freqMap.get(key) || 0;
+                                freqMap.set(key, ++count);
+                            });
+                            chart_2.config.data.datasets[0].data = [...freqMap.values()];
+                            chart_2.config.data.labels = [...freqMap.keys()];
+                            chart_2.update();
+
+                            let cumsumMap = new Map();
+                            filt_js.forEach(function (date) {
+                                let monthName = date.date.toLocaleString("en-us", {
+                                    month: "short"
+                                });
+                                let key = monthName + "-" + date.date.getFullYear().toString().substr(-2);
+                                let count = cumsumMap.get(key) || 0;
+                                cumsumMap.set(key, count + date.price);
+                            });
+
+                            let old = 0;
+                            cumsumMap.forEach(function (price, month) {
+                                old = old + price;
+                                cumsumMap.set(month, old);
+                            });
+
+                            chart_money_2.config.data.datasets[0].data = [...cumsumMap.values()];
+                            chart_money_2.config.data.labels = [...cumsumMap.keys()];
+                            chart_money_2.update();
+                        }
                     </script>
 
                     <div>
